@@ -1,3 +1,4 @@
+using Unity.Cinemachine;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -5,6 +6,7 @@ public class GameManager : NetworkBehaviour
 {
     private static GameManager instance;
     [SerializeField] Transform playerprefab;
+    [SerializeField] CinemachineCamera cameraRef;
     void Start()
     {
         
@@ -22,11 +24,25 @@ public class GameManager : NetworkBehaviour
             Destroy(gameObject);
         }
     }
+    void GetImage()
+    {
+        if (IsOwner)
+        {
+            cameraRef.Follow = playerprefab;
+            /* CameraFollow cam = Camera.main.GetComponent<CameraFollow>();
+             if (cam != null)
+             {
+                 cam.transform.SetParent(playerprefab);
+                 //cam.SetTarget(playerprefab); 
+             }*/
+        }
+    }
     public override void OnNetworkSpawn()
     {
         print(NetworkManager.Singleton.LocalClientId);
         //  Instantiate(playerprefab);
         InstancëPLayerRPC(NetworkManager.Singleton.LocalClientId);
+        GetImage();
     }
     [Rpc(SendTo.Server)]
    public void InstancëPLayerRPC(ulong ownerID)
