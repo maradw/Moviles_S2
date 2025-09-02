@@ -7,11 +7,6 @@ public class GameManager : NetworkBehaviour
     private static GameManager instance;
     [SerializeField] Transform playerprefab;
     [SerializeField] CinemachineCamera cameraRef;
-    void Start()
-    {
-        
-    }
-
     void Awake()
     {
         if(Instance == null)
@@ -24,37 +19,25 @@ public class GameManager : NetworkBehaviour
             Destroy(gameObject);
         }
     }
-    void GetImage()
+    public void SetCameraTarget(Transform playerTransform)
     {
-        if (IsOwner)
-        {
-            cameraRef.Follow = playerprefab;
-            /* CameraFollow cam = Camera.main.GetComponent<CameraFollow>();
-             if (cam != null)
-             {
-                 cam.transform.SetParent(playerprefab);
-                 //cam.SetTarget(playerprefab); 
-             }*/
-        }
+        cameraRef.Follow = playerTransform;
+        cameraRef.LookAt = playerTransform;
     }
     public override void OnNetworkSpawn()
     {
         print(NetworkManager.Singleton.LocalClientId);
-        //  Instantiate(playerprefab);
-        InstancëPLayerRPC(NetworkManager.Singleton.LocalClientId);
-        GetImage();
+        InstancePLayerRPC(NetworkManager.Singleton.LocalClientId);
     }
     [Rpc(SendTo.Server)]
-   public void InstancëPLayerRPC(ulong ownerID)
-    {
+   public void InstancePLayerRPC(ulong ownerID)
+   {
         Transform player = Instantiate(playerprefab);
-       // player.GetComponent<NetworkObject>().(true);
         player.GetComponent<NetworkObject>().SpawnWithOwnership(ownerID, true);
-
-    }
-    void Update()
-    {
-        
-    }
+   }
     public static GameManager Instance => instance;
 }
+/* if (ownerID == NetworkManager.Singleton.LocalClientId)
+ {
+     SetCameraTarget(player);
+ }*/
